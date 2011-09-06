@@ -2,6 +2,8 @@ require 'bundler/setup'
 
 Bundler.require
 
+require 'yaml'
+
 def snapshot(database, tables, output_dir)
   Dir.mkdir(output_dir)
   tables.each do |table|
@@ -18,7 +20,16 @@ if Dir.exist?("after")
   FileUtils.rm_r("after")
 end
 
-database = Sequel.connect(:adapter=>'postgres', :host=>'localhost', :database=>'db_name', :user=>'db_user', :password=>'db_pass')
+config = YAML.load_file("database.yml")
+
+database = Sequel.connect(
+  :adapter  => 'postgres',
+  :host     => config['db_host'],
+  :database => config['db_name'],
+  :user     => config['db_user'],
+  :password => config['db_pass']
+)
+
 tables = database.tables - [:schema_migrations]
 
 snapshot(database, tables, "after")  if     Dir.exist?("before")
