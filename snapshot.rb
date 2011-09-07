@@ -30,7 +30,7 @@ database = Sequel.connect(
   :password => config['db_pass']
 )
 
-tables = database.tables - [:schema_migrations]
+tables = database.tables - config['black_listed_tables']
 
 snapshot(database, tables, "after")  if     Dir.exist?("before")
 snapshot(database, tables, "before") unless Dir.exist?("before")
